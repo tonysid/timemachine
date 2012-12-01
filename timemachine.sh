@@ -104,7 +104,7 @@ echo Starting backup at $date. | mail -s "rsync backup started (PID $PID)" root
         --max-size='100K' \
         --stats \
         $BACKUPDIR $DESTINATION/incomplete_back-$date && \
-        mv $DESTINATION/incomplete_back-$date $DESTINATION/backup-$date &&\
+        mv $DESTINATION/incomplete_back-$date $DESTINATION/backup-$date && \
         if [ -e $DESTINATION/latest ]
         then
             rm $DESTINATION/latest
@@ -112,8 +112,9 @@ echo Starting backup at $date. | mail -s "rsync backup started (PID $PID)" root
             ln -f -s backup-$date $DESTINATION/latest && \
             ( echo Backed up to $DESTINATION && echo && echo Contents of backup-$date.log && \
             grep -v .Private $DESTINATION/backup-$date.log && echo && ( ls -alFth $DESTINATION | head -5 ) ) | mail -s "rsync backup complete" root && \
-            su -c "Backup complete." `echo $HOME | sed 's/.*\/*\///'`
-        echo Backed up to $DESTINATION.
+            su -c "Backup complete." `echo $HOME | sed 's/.*\/*\///'` || \
+            notify-send "The time machine failed."
+        echo Exiting time machine.
 
         rm $HOME/.timemachine.pid
 
